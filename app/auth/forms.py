@@ -1,8 +1,10 @@
-from flask_wtf import Form
+#encoding: utf-8
+
+from flask_wtf import FlaskForm as Form
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField
 from wtforms.validators import Required, Length, Email, Regexp, EqualTo
 from wtforms import ValidationError
-from pymongo import MongoClient
+# from pymongo import MongoClient
 
 Province_choice = [('北京市', '北京市'), ('天津市', '天津市'), ('上海市', '上海市'), ('天津市', '天津市'), ('重庆市', '重庆市'), ('河北', '河北'),
                    ('山东', '山东'), ('辽宁', '辽宁'), ('黑龙江', '黑龙江'), ('吉林', '吉林'), ('甘肃', '甘肃'), ('青海', '青海'),
@@ -13,8 +15,7 @@ Province_choice = [('北京市', '北京市'), ('天津市', '天津市'), ('上
 
 
 class LoginForm(Form):
-    email = StringField('登录邮箱', validators=[Required(), Length(1, 64),
-                                            Email()])
+    username = StringField('用户名', validators=[Required(), Length(1, 64)])
     password = PasswordField('密码', validators=[Required()])
     remember_me = BooleanField('保持登录')
     submit = SubmitField('登录')
@@ -29,20 +30,22 @@ class RegistrationForm(Form):
     password = PasswordField('密码', validators=[
         Required(), EqualTo('password2', message='两次密码不一致.')])
     password2 = PasswordField('确认密码', validators=[Required()])
-    name = StringField('姓名', validators=[
-        Required(), Length(1, 20), Regexp('^[a-zA-Z\u4e00-\u9fa5]*$', 0,
-                                          '只能输入英文和中文.')])
-    location = SelectField('地址', choices=Province_choice)
-    about_me = TextAreaField('自我介绍')
+    # name = StringField('姓名', validators=[
+    #     Required(), Length(1, 20), Regexp('^[a-zA-Z\u4e00-\u9fa5]*$', 0,
+    #                                       '只能输入英文和中文.')])
+    # location = SelectField('地址', choices=Province_choice)
+    # about_me = TextAreaField('自我介绍')
     submit = SubmitField('立即注册')
 
     def validate_email(self, field):
-        if MongoClient().blog.User.find_one({'temp': field.data}):
-            raise ValidationError('邮箱已被注册.')
+        pass
+        # if MongoClient().blog.User.find_one({'temp': field.data}):
+        #     raise ValidationError('邮箱已被注册.')
 
     def validate_username(self, field):
-        if MongoClient().blog.User.find_one({'username': field.data}):
-            raise ValidationError('用户名已被注册.')
+        pass
+        # if MongoClient().blog.User.find_one({'username': field.data}):
+        #     raise ValidationError('用户名已被注册.')
 
 
 class PasswordResetRequestForm(Form):
@@ -51,8 +54,9 @@ class PasswordResetRequestForm(Form):
     submit = SubmitField('提交')
 
     def validate_email(self, field):
-        if MongoClient().blog.User.find_one({'temp': field.data}) is None:
-            raise ValidationError('邮箱不存在,请重新确认')
+        pass
+        # if MongoClient().blog.User.find_one({'temp': field.data}) is None:
+        #     raise ValidationError('邮箱不存在,请重新确认')
 
 
 class PasswordResetForm(Form):
@@ -76,5 +80,6 @@ class ChangeEmailForm(Form):
     submit = SubmitField('修改')
 
     def validate_email(self, field):
-        if MongoClient().blog.User.find_one({'temp': field.data}) is not None:
-            raise ValidationError('此邮箱已经注册.')
+        pass
+        # if MongoClient().blog.User.find_one({'temp': field.data}) is not None:
+            # raise ValidationError('此邮箱已经注册.')

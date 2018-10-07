@@ -1,7 +1,9 @@
-from flask_wtf import Form
+#encoding: utf-8
+
+from flask_wtf import FlaskForm as Form
 from wtforms import StringField, SubmitField, TextAreaField, SelectField, BooleanField
 from ..auth.forms import Province_choice
-from pymongo import MongoClient
+# from pymongo import MongoClient
 from wtforms import ValidationError
 from wtforms.validators import Required, Length, Email, Regexp, EqualTo
 from flask_pagedown.fields import PageDownField
@@ -35,14 +37,14 @@ class EditProfileAdminForm(Form):
     def validate_email(self, field):
         if field.data == self.user.username:
             return
-        if MongoClient().blog.User.find_one({'temp': field.data}):
-            raise ValidationError('邮箱已被注册.')
+        # if MongoClient().blog.User.find_one({'temp': field.data}):
+        #     raise ValidationError('邮箱已被注册.')
 
     def validate_username(self, field):
         if field.data == self.user.username:
             return
-        if MongoClient().blog.User.find_one({'username': field.data}):
-            raise ValidationError('用户名已被注册.')
+        # if MongoClient().blog.User.find_one({'username': field.data}):
+        #     raise ValidationError('用户名已被注册.')
 
 
 class PostForm(Form):

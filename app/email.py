@@ -6,7 +6,7 @@ from . import mail
 import io
 import sys
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+# sys.stdout = io.TextIOWrapper(sys.stdout.readlines(), encoding='utf-8')
 
 
 def send_async_email(app, msg):
