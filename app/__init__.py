@@ -13,6 +13,8 @@ bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
 pagedown = PageDown()
+
+# 独立出来：database.py
 # db = SQLAlchemy()
 
 login_manager = LoginManager()

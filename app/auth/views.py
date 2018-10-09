@@ -2,13 +2,16 @@
 
 from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
-from . import auth
+import time
+from flask import current_app
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature
+
 from ..models import verify_password, User, Role, Temp, generate_reset_password_confirmation_token, encrypt_passowrd, \
     generate_change_email_confirmation_token
 from .forms import LoginForm, RegistrationForm, PasswordResetRequestForm, PasswordResetForm, ChangePasswordForm, \
     ChangeEmailForm
-
-
+from ..email import send_email
+from . import auth
 from .. import db
 import sys
 reload(sys)
@@ -128,39 +131,41 @@ def register():
 #     return redirect(url_for('main.index'))
 
 
-@auth.route('/password_reset_request', methods=['GET', 'POST'])
+@auth.route('/password_reset', methods=['GET', 'POST'])
 def password_reset_request():
     form = PasswordResetRequestForm()
-#     if form.validate_on_submit():
-#         email = form.email.data
-#         token = generate_reset_password_confirmation_token(email=email)
-#         send_email(email, 'Reset Your Password',
-#                    'auth/temp/reset_password', token=token)
-#         flash('A reset password temp has been sent to you by temp.')
-#         return redirect(url_for('auth.login'))
+    if form.validate_on_submit():
+        email = form.email.data
+        token = generate_reset_password_confirmation_token(email=email)
+        send_email(email, 'Reset Your Password',
+                   'auth/temp/reset_password', token=token)
+        flash('A reset password temp has been sent to you by temp.')
+        return redirect(url_for('auth.login'))
     return render_template('auth/reset_password.html', form=form)
 
 
 @auth.route('/password_reset/<token>', methods=['GET', 'POST'])
 def password_reset(token):
     form = PasswordResetForm()
-    # s = Serializer(current_app.config['SECRET_KEY'])
-    # try:
-    #     s.loads(token)
-    # except BadSignature:
-    #     return render_template('Link_expired.html')
-    # data = s.loads(token)
-    # email = data.get('password_reset')
-    # user = MongoClient().blog.User.find_one({'temp': email})
-    # if user is None:
-    #     flash('The confirmation link is invalid or has expired.')
-    #     time.sleep(3)
-    #     return redirect(url_for('main.index'))
-    # if form.validate_on_submit():
-    #     password = encrypt_passowrd(form.password.data)
-    #     MongoClient().blog.User.update({'temp': email}, {'$set': {'password': password}})
-    #     flash('Change Success,you can now login.')
-    #     return redirect(url_for('auth.login'))
+    s = Serializer(current_app.config['SECRET_KEY'])
+    try:
+        s.loads(token)
+    except BadSignature:
+        return render_template('Link_expired.html')
+    data = s.loads(token)
+    email = data.get('password_reset')
+    user = User.query.filter(User.email==email).first()
+    if user is None:
+        flash('The confirmation link is invalid or has expired.')
+        time.sleep(3)
+        return redirect(url_for('main.index'))
+    if form.validate_on_submit():
+        print form.password.data
+        password = encrypt_passowrd(form.password.data)
+        user.password_hash = password
+        db.session.commit()
+        flash('Change Success,you can now login.')
+        return redirect(url_for('auth.login'))
     return render_template('auth/reset_password.html', form=form)
 
 
@@ -168,15 +173,17 @@ def password_reset(token):
 @login_required
 def change_password():
     form = ChangePasswordForm()
-    # if form.validate_on_submit():
-    #     if not verify_password(current_user.password_hash, form.old_password.data):
-    #         flash('old password is not correct')
-    #         form.data.clear()
-    #     else:
-    #         password = encrypt_passowrd(form.password.data)
-    #         MongoClient().blog.User.update({'temp': current_user.email}, {'$set': {'password': password}})
-    #         flash('Change Success,you can now login.')
-    #         return redirect(url_for('auth.login'))
+    if form.validate_on_submit():
+        if not verify_password(current_user.password_hash, form.old_password.data):
+            flash('old password is not correct')
+            form.data.clear()
+        else:
+            password = encrypt_passowrd(form.password.data)
+            user = User.query.filter(User.username==current_user.username).first()
+            user.password_hash = password
+            db.session.commit()
+            flash('Change Success,you can now login.')
+            return redirect(url_for('auth.login'))
     return render_template('auth/change_password.html', form=form)
 
 

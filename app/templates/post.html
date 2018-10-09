@@ -10,6 +10,7 @@
         <h4 id="comments">评论</h4>
         {% if current_user.can(Permission.COMMENT) %}
             <div class="comment-form">
+                {{ form.csrf_token }}
                 {{ wtf.quick_form(form) }}
             </div>
         {% endif %}

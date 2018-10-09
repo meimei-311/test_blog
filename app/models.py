@@ -76,8 +76,12 @@ class User(UserMixin, db.Model):
 ###User继承UserMixin和db.Model类的功能属性
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(64))
+    telephone = db.Column(db.String(64), unique=True)
     email = db.Column(db.String(64), unique=True, index=True)
     username = db.Column(db.String(64), unique=True, index=True)
+    about_me = db.Column(db.Text)
+
     activate = db.Column(db.Boolean, default=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     password_hash = db.Column(db.String(128))
