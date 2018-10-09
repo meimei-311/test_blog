@@ -12,7 +12,8 @@ from datetime import datetime
 import time
 # from markdown import markdown
 # import bleach
-from app import db
+# from app import db
+from database import db
 
 
 def generate_reset_password_confirmation_token(email, expiration=3600):
@@ -96,6 +97,10 @@ class User(UserMixin, db.Model):
         return self.role is not None and \
                (self.role.permissions & permission) == permission
 
+    def is_administrator(self):
+        return self.role is not None and \
+                (self.role.permissions & Permission.ADMINISTER) == Permission.ADMINISTER
+
     def __repr__(self):
         return '<User %r>' % self.username
 
@@ -126,7 +131,6 @@ class Post(db.Model):
             'body_html': self.body_html,
             'comments': []
         }
-        # MongoClient().blog.Aritical.insert(collection)
 
 
 

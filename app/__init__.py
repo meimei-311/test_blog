@@ -6,14 +6,14 @@ from flask_mail import Mail
 from flask_moment import Moment
 from flask_login import LoginManager
 from flask_pagedown import PageDown
-from flask_sqlalchemy import SQLAlchemy
+from database import db
 from config import config
 
 bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
 pagedown = PageDown()
-db = SQLAlchemy()
+# db = SQLAlchemy()
 
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
@@ -39,6 +39,6 @@ def create_app(config_name):
     app.register_blueprint(main_blueprint)
 
     from .auth import auth as auth_blueprint
-    app.register_blueprint(auth_blueprint, url_prefix='/auth')
+    app.register_blueprint(auth_blueprint, url_prefix='/u')
 
     return app

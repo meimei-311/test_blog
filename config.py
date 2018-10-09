@@ -14,7 +14,7 @@ class Config:
     DIALECT = 'mysql'
     DRIVER = 'mysqldb'
     USERNAME = 'root'
-    PASSWORD = 'Huang518'
+    PASSWORD = 'root'
     HOST = '127.0.0.1'
     PORT = '3306'
     DATABASE = 'flask_demo'

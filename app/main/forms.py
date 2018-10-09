@@ -10,9 +10,10 @@ from flask_pagedown.fields import PageDownField
 
 
 class EditProfileForm(Form):
-    name = StringField('姓名', validators=[Length(0, 64)])
-    location = SelectField('地址', choices=Province_choice)
-    about_me = TextAreaField('自我介绍', validators=[Length(0, 64)])
+    username = StringField('用户名', validators=[Length(0, 64)])
+    # location = SelectField('地址', choices=Province_choice)
+    # about_me = TextAreaField('自我介绍', validators=[Length(0, 64)])
+    email = StringField('邮箱', validators=[Length(0, 64)])
     submit = SubmitField('提交')
 
 
