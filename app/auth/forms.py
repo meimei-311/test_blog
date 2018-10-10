@@ -36,7 +36,6 @@ class RegistrationForm(Form):
             message='两次密码不一致')])
     password2 = PasswordField('确认密码', render_kw={'placeholder':u'请再次输入密码'},
         validators=[Required()])
-    # location = SelectField('地址', choices=Province_choice)
     about_me = TextAreaField('备注')
     submit = SubmitField('立即注册')
 
@@ -47,6 +46,10 @@ class RegistrationForm(Form):
     def validate_username(self, field):
         if User.query.filter(User.username==field.data).first():
             raise ValidationError('用户名已被注册.')
+
+    def validate_telephone(self, field):
+        if User.query.filter(User.telephone==field.data).first():
+            raise ValidationError('手机号已被注册.')
 
 
 class PasswordResetRequestForm(Form):
@@ -86,3 +89,57 @@ class ChangeEmailForm(Form):
         pass
         # if MongoClient().blog.User.find_one({'temp': field.data}) is not None:
             # raise ValidationError('此邮箱已经注册.')
+
+class EditProfileForm(Form):
+    name = StringField('姓名', validators=[Length(1, 20)])
+    telephone = StringField('电话', validators=[Length(1, 32)])
+    email = StringField('邮箱', validators=[Length(0, 64)])
+    username = StringField('用户名', validators=[Length(0, 64)])
+    about_me = TextAreaField('备注')
+    submit = SubmitField('提交')
+
+
+class EditProfileAdminForm(Form):
+    choices = [('Administrator', '管理员'), ('Moderator', '协管员'), ('User', '用户')]
+
+    name = StringField('姓名', render_kw={'placeholder':u'请输入姓名'}, validators=[Required(),
+        Length(1, 20), Regexp('^[a-zA-Z\u4e00-\u9fa5]*$', 0, '只能输入英文和中文')])
+    telephone = StringField('电话', render_kw={'placeholder':u'请输入手机号码'},
+        validators=[Required(), Length(1, 32), Regexp('^[0-9+-.]*$', 0, '请输入正确的手机号码')])
+    email = StringField('邮箱', render_kw={'placeholder':u'请输入邮箱地址'},
+        validators=[Required(), Length(1, 64), Email()])
+    username = StringField('用户名', render_kw={'placeholder':u'请输入用户名'},
+        validators=[Required(), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0, '支持英文和字母下划线')])
+    password = PasswordField('密码', render_kw={'placeholder':u'请输入密码，字母、数字和特殊符号组合'},
+        validators=[Required(), Length(6, 20, message='长度位于6~20之间'),
+        Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0, '支持英文和字母下划线'), EqualTo('password2',
+            message='两次密码不一致')])
+    password2 = PasswordField('确认密码', render_kw={'placeholder':u'请再次输入密码'},
+        validators=[Required()])
+    about_me = TextAreaField('备注')
+
+    activate = BooleanField('账户激活状态')
+    role = SelectField('权限', choices=choices)
+    submit = SubmitField('Submit')
+
+    def __init__(self, user, *args, **kwargs):
+        super(EditProfileAdminForm, self).__init__(*args, **kwargs)
+        self.user = user
+
+    def validate_email(self, field):
+        if field.data == self.user.username:
+            return
+        if User.query.filter(User.email==field.data).first():
+            raise ValidationError('邮箱已被注册.')
+
+    def validate_username(self, field):
+        if field.data == self.user.username:
+            return
+        if User.query.filter(User.username==field.data).first():
+            raise ValidationError('用户名已被注册.')
+
+    def validate_telephone(self, field):
+        if field.data == self.user.telephone:
+            return
+        if User.query.filter(User.telephone==field.data).first():
+            raise ValidationError('手机已被注册.')

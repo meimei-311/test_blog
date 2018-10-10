@@ -6,11 +6,11 @@ from . import main
 from ..models import Temp, Permission
 from flask_login import login_required, current_user
 from flask import redirect, url_for
-from .forms import EditProfileForm, EditProfileAdminForm, PostForm, EditPostForm, CommentForm
+from .forms import PostForm, EditPostForm, CommentForm
 from ..models import User, Role, Post
 from ..database import db
 
-# from ..decorators import admin_required, permission_required
+from ..decorators import admin_required, permission_required
 # from bson.objectid import ObjectId
 # from datetime import datetime
 
@@ -261,88 +261,8 @@ def index():
     # return render_template('index.html')
 
 
-@main.route('/user/<username>')
-@login_required
-def user(username):
-#     user_temp = MongoClient().blog.User.find_one({'username': username})
-#     if user_temp is None:
-#         abort(404)
-    user = User.query.filter(User.username == username).first()
-    # user = Temp(id=user_temp.get('_id'), username=user_temp.get('username'), email=user_temp.get('email'),
-#                 password=user_temp.get('password'), activate=user_temp.get('activate'), role=user_temp.get('role'),
-#                 name=user_temp.get('name'),
-#                 location=user_temp.get('location'), about_me=user_temp.get('about_me'),
-#                 last_since=user_temp.get('last_since'),
-#                 member_since=user_temp.get('member_since'))
-#     page = request.args.get('page', 1, type=int)
-    # pagination = PaginateUser(page, username)
-    # posts = pagination.item
-    posts = None
-    pagination = []
-    followers = []
-    following = []
-    # followers = user_temp.get('followers')
-    # following = user_temp.get('following')
-    return render_template('user.html', user=user, posts=posts, pagination=pagination, followers=followers,
-                           following=following)
 
 
-@main.route('/edit_profile', methods=['GET', 'POST'])
-@login_required
-def edit_profile():
-    form = EditProfileForm()
-    if form.validate_on_submit():
-        print "commit"
-        # MongoClient().blog.User.update({'email': current_user.email}, {'$set': {'name': form.name.data}})
-        # MongoClient().blog.User.update({'email': current_user.email}, {'$set': {'location': form.location.data}})
-        # MongoClient().blog.User.update({'email': current_user.email}, {'$set': {'about_me': form.about_me.data}})
-        user = User.query.filter(User.username==current_user.username).first()
-        user.email = form.email.data
-        db.session.commit()
-        current_user.username = form.username.data
-        current_user.email = form.email.data
-        # current_user.location = form.location.data
-        # current_user.about_me = form.about_me.data
-        flash('更改已保存')
-    form.username.data = current_user.username
-    form.email.data = current_user.email
-    # form.location.data = current_user.location
-    # form.about_me.data = current_user.about_me
-    return render_template('edit_profile.html', form=form)
-
-
-# @main.route('/edit-profile/<id>', methods=['GET', 'POST'])
-# @login_required
-# @admin_required
-# def edit_profile_admin(id):
-#     user = MongoClient().blog.User.find_one({'_id': ObjectId(id)})
-#     if user is None:
-#         return abort(404)
-#     user_temp = Temp(id=user.get('_id'), username=user.get('username'), email=user.get('email'),
-#                      password=user.get('password'), activate=user.get('activate'), role=user.get('role'),
-#                      name=user.get('name'),
-#                      location=user.get('location'), about_me=user.get('about_me'),
-#                      last_since=user.get('last_since'),
-#                      member_since=user.get('member_since'))
-#     form = EditProfileAdminForm(user=user_temp)
-#     if form.validate_on_submit():
-#         MongoClient().blog.User.update({'email': user_temp.email}, {'$set': {'name': form.name.data}})
-#         MongoClient().blog.User.update({'email': user_temp.email}, {'$set': {'username': form.username.data}})
-#         MongoClient().blog.User.update({'email': user_temp.email}, {'$set': {'email': form.email.data}})
-#         MongoClient().blog.User.update({'email': user_temp.email}, {'$set': {'activate': form.activate.data}})
-#         MongoClient().blog.User.update({'email': user_temp.email}, {'$set': {'role': form.role.data}})
-#         MongoClient().blog.User.update({'email': user_temp.email}, {'$set': {'location': form.location.data}})
-#         MongoClient().blog.User.update({'email': user_temp.email}, {'$set': {'about_me': form.about_me.data}})
-#         flash('The profile has been updated.')
-#         return redirect(url_for('.user', username=user_temp.username))
-#     form.email.data = user_temp.email
-#     form.username.data = user_temp.username
-#     form.activate.data = user_temp.activate
-#     form.role.data = user_temp.role.name
-#     form.name.data = user_temp.name
-#     form.location.data = user_temp.location
-#     form.about_me.data = user_temp.about_me
-#     return render_template('edit_profile.html', form=form, user=user_temp)
 
 #
 # @main.route('/post/<id>', methods=['GET', 'POST'])
